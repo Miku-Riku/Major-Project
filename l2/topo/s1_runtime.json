@@ -1,0 +1,27 @@
+{
+    "target": "bmv2",
+    "p4info": "build/l2.p4.p4info.txt",
+    "bmv2_json": "build/l2.json",
+    "table_entries": [
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:01:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 1
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:02:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 2
+            }
+        }
+    ]
+}

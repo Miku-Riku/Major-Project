@@ -1,0 +1,124 @@
+diff --git a/stratum/hal/bin/bmv2/BUILD b/stratum/hal/bin/bmv2/BUILD
+index bd6369c7..8266d04f 100644
+--- a/stratum/hal/bin/bmv2/BUILD
++++ b/stratum/hal/bin/bmv2/BUILD
+@@ -16,6 +16,7 @@ stratum_cc_binary(
+     srcs = [
+         "main.cc",
+     ],
++    linkopts = ["-ldl"],
+     arches = HOST_ARCHES,
+     data = ["dummy.json"],
+     deps = [
+diff --git a/stratum/hal/bin/bmv2/main.cc b/stratum/hal/bin/bmv2/main.cc
+index b68bd6cd..c5f387ba 100644
+--- a/stratum/hal/bin/bmv2/main.cc
++++ b/stratum/hal/bin/bmv2/main.cc
+@@ -1,6 +1,11 @@
+ // Copyright 2018-present Barefoot Networks, Inc.
+ // SPDX-License-Identifier: Apache-2.0
+ 
++#define BM_HAVE_DLOPEN
++#define BM_ENABLE_MODULES
++
++#include <dlfcn.h>
++
+ #include "PI/frontends/proto/device_mgr.h"
+ #include "PI/frontends/proto/logging.h"
+ #include "bm/bm_sim/logger.h"
+@@ -23,6 +28,7 @@ DEFINE_uint32(cpu_port, 64,
+ DEFINE_bool(console_logging, true, "Log BMv2 message to console.");
+ DEFINE_string(bmv2_log_level, "info",
+               "Log level of Bmv2(trace, debug, info, warn, error, off)");
++DEFINE_string(load_modules, "", "Loads external module");
+ 
+ namespace stratum {
+ namespace hal {
+@@ -124,6 +130,13 @@ void ParseInterfaces(int argc, char* argv[], bm::OptionsParser& parser) {
+   LOG(ERROR) << "Starting bmv2 simple_switch and waiting for P4 pipeline";
+   // blocks until a P4 pipeline is set
+   {
++    LOG(INFO) << "load-modules arg: " << FLAGS_load_modules;
++    if (!dlopen(FLAGS_load_modules.c_str(), RTLD_NOW | RTLD_GLOBAL)) {
++      LOG(ERROR) << "Failed to dlopen module: " << dlerror();
++    } else {
++      LOG(INFO) << "dlopen module success";
++    }
++
+     int status = runner->init_and_start(parser);
+     RET_CHECK(status == 0) << "Error when starting bmv2 simple_switch, status: "
+                            << status;
+diff --git a/tools/mininet/Dockerfile b/tools/mininet/Dockerfile
+index 9684b02b..f06f0c46 100644
+--- a/tools/mininet/Dockerfile
++++ b/tools/mininet/Dockerfile
+@@ -69,11 +69,13 @@ RUN ldconfig
+ WORKDIR /root
+ COPY stratum/hal/bin/bmv2/dummy.json ./dummy.json
+ COPY tools/mininet/stratum.py ./stratum.py
+-ENV PYTHONPATH /root:/usr/local/lib/python3.7/dist-packages:/usr/local/lib/python3.7/site-packages
++ENV PYTHONPATH :/root:/usr/local/lib/python3.7/dist-packages:/usr/local/lib/python3.7/site-packages
+ 
+ # We need to expose one port per stratum_bmv2 instance, hence the number of
+ # exposed ports limit the number of switches that can be controlled from an
+ # external P4Runtime controller.
+ EXPOSE 50001-50100
+ 
+-ENTRYPOINT ["mn", "--custom", "/root/stratum.py", "--switch", "stratum-bmv2", "--host", "no-offload-host", "--controller", "none"]
++# ENTRYPOINT ["mn", "--custom", "/root/stratum.py", "--switch", "stratum-bmv2", "--host", "no-offload-host", "--controller", "none"]
++
++ENTRYPOINT [ "python3" ]
+diff --git a/tools/mininet/build-stratum-bmv2-container.sh b/tools/mininet/build-stratum-bmv2-container.sh
+index ef4f508f..52ab7f97 100755
+--- a/tools/mininet/build-stratum-bmv2-container.sh
++++ b/tools/mininet/build-stratum-bmv2-container.sh
+@@ -49,7 +49,7 @@ fi
+ # Build with Bazel cache
+ if [ -n "$BAZEL_CACHE" ]; then
+   DOCKER_OPTS+="-v $BAZEL_CACHE:/home/$USER/.cache "
+-  DOCKER_OPTS+="--user $USER "
++  DOCKER_OPTS+="--user root "
+ fi
+ 
+ # Build Stratum BMv2 in Docker
+@@ -92,7 +92,7 @@ popd
+ 
+ # Build Stratum BF runtime Docker image
+ STRATUM_NAME=$(echo $STRATUM_TARGET | sed 's/_/-/')
+-RUNTIME_IMAGE=opennetworking/mn-stratum
++RUNTIME_IMAGE=shank03/mn-stratum
+ echo "Building Stratum runtime image: $RUNTIME_IMAGE"
+ set -x
+ docker build \
+diff --git a/tools/mininet/stratum.py b/tools/mininet/stratum.py
+index 999c4154..eec32bf2 100644
+--- a/tools/mininet/stratum.py
++++ b/tools/mininet/stratum.py
+@@ -102,7 +102,7 @@ class StratumBmv2Switch(Switch):
+ 
+     def __init__(self, name, json=STRATUM_INIT_PIPELINE, loglevel="warn",
+                  cpuport=DEFAULT_CPU_PORT, pipeconf=DEFAULT_PIPECONF,
+-                 onosdevid=None, adminstate=True, grpcPort=None,
++                 onosdevid=None, adminstate=True, grpcPort=None, extModule=None,
+                  **kwargs):
+         Switch.__init__(self, name, **kwargs)
+         if grpcPort is not None:
+@@ -134,6 +134,8 @@ class StratumBmv2Switch(Switch):
+         self.keepaliveFile = '/tmp/%s-watchdog.out' % self.name
+         self.adminState = "ENABLED" if adminstate else "DISABLED"
+ 
++        self.extModule = extModule if extModule is not None else ""
++
+         # Remove files from previous executions
+         self.cleanupTmpFiles()
+         os.mkdir(self.tmpDir)
+@@ -218,6 +220,9 @@ nodes {{
+             '-bmv2_log_level=%s' % self.loglevel,
+         ]
+ 
++        if len(self.extModule) > 0:
++            args.append("-load_modules=%s" % self.extModule)
++
+         cmd_string = " ".join(args)
+ 
+         try:

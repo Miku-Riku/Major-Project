@@ -1,0 +1,102 @@
+{
+    "target": "bmv2",
+    "p4info": "build/l2.p4.p4info.txt",
+    "bmv2_json": "build/l2.json",
+    "table_entries": [
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "default_action": true,
+            "action_name": "L2_Ingress.drop",
+            "action_params": {}
+        },
+        {
+            "table": "L2_Egress.sw_metrics",
+            "default_action": true,
+            "action_name": "L2_Egress.set_metrics",
+            "action_params": {
+                "dpid": "AA:00:00:00:00:00",
+                "sw": 0
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:01:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 1
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:02:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 1
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:03:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 2
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:04:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 2
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:05:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 3
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:06:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 3
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:07:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 4
+            }
+        },
+        {
+            "table": "L2_Ingress.ethernet_exact",
+            "match": {
+                "hdr.ethernet.dstAddr": "00:00:00:00:08:00"
+            },
+            "action_name": "L2_Ingress.mac_forward",
+            "action_params": {
+                "port": 4
+            }
+        }
+    ]
+}

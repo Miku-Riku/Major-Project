@@ -1,0 +1,41 @@
+{
+    "target": "bmv2",
+    "p4info": "build/l3.p4.p4info.txt",
+    "bmv2_json": "build/l3.json",
+    "table_entries": [
+        {
+            "table": "L3_Ingress.ipv4_lpm",
+            "default_action": true,
+            "action_name": "L3_Ingress.drop",
+            "action_params": {}
+        },
+        {
+            "table": "L3_Ingress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "192.168.1.0",
+                    24
+                ]
+            },
+            "action_name": "L3_Ingress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "00:00:00:00:01:00",
+                "port": 1
+            }
+        },
+        {
+            "table": "L3_Ingress.ipv4_lpm",
+            "match": {
+                "hdr.ipv4.dstAddr": [
+                    "10.0.0.0",
+                    24
+                ]
+            },
+            "action_name": "L3_Ingress.ipv4_forward",
+            "action_params": {
+                "dstAddr": "00:00:00:00:02:00",
+                "port": 2
+            }
+        }
+    ]
+}

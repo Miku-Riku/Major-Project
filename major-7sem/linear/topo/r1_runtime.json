@@ -1,0 +1,99 @@
+{
+    "target": "bmv2",
+    "p4info": "build/l3.p4.p4info.txt",
+    "bmv2_json": "build/l3.json",
+    "table_entries": [
+        {
+            "table": "L3_Ingress.mac_table",
+            "match": {
+                "meta.dstIp": "192.168.1.1"
+            },
+            "action_name": "L3_Ingress.forward",
+            "action_params": {
+                "macAddr": "10:00:00:00:00:00"
+            }
+        },
+        {
+            "table": "L3_Ingress.mac_table",
+            "match": {
+                "meta.dstIp": "192.168.1.2"
+            },
+            "action_name": "L3_Ingress.forward",
+            "action_params": {
+                "macAddr": "00:00:00:00:01:00"
+            }
+        },
+        {
+            "table": "L3_Ingress.mac_table",
+            "match": {
+                "meta.dstIp": "192.168.1.3"
+            },
+            "action_name": "L3_Ingress.forward",
+            "action_params": {
+                "macAddr": "00:00:00:00:02:00"
+            }
+        },
+        {
+            "table": "L3_Ingress.mac_table",
+            "match": {
+                "meta.dstIp": "10.0.0.1"
+            },
+            "action_name": "L3_Ingress.forward",
+            "action_params": {
+                "macAddr": "20:00:00:00:00:00"
+            }
+        },
+        {
+            "table": "L3_Ingress.mac_table",
+            "match": {
+                "meta.dstIp": "10.0.0.2"
+            },
+            "action_name": "L3_Ingress.forward",
+            "action_params": {
+                "macAddr": "00:00:00:00:03:00"
+            }
+        },
+        {
+            "table": "L3_Ingress.mac_table",
+            "match": {
+                "meta.dstIp": "10.0.0.3"
+            },
+            "action_name": "L3_Ingress.forward",
+            "action_params": {
+                "macAddr": "00:00:00:00:04:00"
+            }
+        },
+        {
+            "table": "L3_Ingress.ipv4_lpm",
+            "default_action": true,
+            "action_name": "L3_Ingress.drop",
+            "action_params": {}
+        },
+        {
+            "table": "L3_Ingress.ipv4_lpm",
+            "match": {
+                "meta.dstIp": [
+                    "192.168.1.0",
+                    24
+                ]
+            },
+            "action_name": "L3_Ingress.set_dst_egress",
+            "action_params": {
+                "port": 1
+            }
+        },
+        {
+            "table": "L3_Ingress.ipv4_lpm",
+            "match": {
+                "meta.dstIp": [
+                    "10.0.0.0",
+                    24
+                ]
+            },
+            "action_name": "L3_Ingress.set_dst_egress",
+            "action_params": {
+                "port": 2
+            }
+        }
+    ]
+}

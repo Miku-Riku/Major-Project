@@ -1,0 +1,18 @@
+*   6 org.onosproject.optical-model        2.7.0    Optical Network Model
+*  12 org.onosproject.hostprovider         2.7.0    Host Location Provider
+*  13 org.onosproject.lldpprovider         2.7.0    LLDP Link Provider
+*  16 org.onosproject.protocols.grpc       2.7.0    gRPC Protocol Subsystem
+*  17 org.onosproject.protocols.gnmi       2.7.0    gNMI Protocol Subsystem
+*  18 org.onosproject.generaldeviceprovider 2.7.0    General Device Provider
+*  19 org.onosproject.drivers.gnmi         2.7.0    gNMI Drivers
+*  20 org.onosproject.protocols.gnoi       2.7.0    gNOI Protocol Subsystem
+*  21 org.onosproject.drivers.gnoi         2.7.0    gNOI Drivers
+*  22 org.onosproject.protocols.p4runtime  2.7.0    P4Runtime Protocol Subsystem
+*  23 org.onosproject.p4runtime            2.7.0    P4Runtime Provider
+*  24 org.onosproject.drivers              2.7.0    Default Drivers
+*  25 org.onosproject.drivers.p4runtime    2.7.0    P4Runtime Drivers
+*  26 org.onosproject.pipelines.basic      2.7.0    Basic Pipelines
+*  27 org.onosproject.drivers.stratum      2.7.0    Stratum Drivers
+*  48 org.onosproject.drivers.bmv2         2.7.0    BMv2 Drivers
+* 151 org.onosproject.fwd                  2.7.0    Reactive Forwarding
+* 155 org.onosproject.gui2                 2.7.0    ONOS GUI2
